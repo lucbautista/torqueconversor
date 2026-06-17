@@ -1,6 +1,6 @@
 const CACHE = 'torqueconversor-v1';
 const FILES = [
-  './torqueconversor.html',
+  './index.html',
   './manifest.json'
 ];
 
