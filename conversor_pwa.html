@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Conversor Mecánico</title>
+
+  <!-- PWA meta tags para iOS -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Conversor">
+  <meta name="theme-color" content="#ffffff">
+
+  <!-- Ícono para pantalla de inicio (puedes cambiar la URL por una imagen tuya) -->
+  <link rel="apple-touch-icon" href="https://fav.farm/🔧">
+
+  <!-- Manifest PWA -->
+  <link rel="manifest" href="manifest.json">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #ffffff;
+      --bg2: #f5f5f5;
+      --bg3: #ebebeb;
+      --text: #1a1a1a;
+      --text2: #666666;
+      --border: rgba(0,0,0,0.12);
+      --accent: #1a6ef5;
+      --accent-bg: #e8f0fe;
+      --radius: 12px;
+      --safe-top: env(safe-area-inset-top);
+      --safe-bot: env(safe-area-inset-bottom);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #1c1c1e;
+        --bg2: #2c2c2e;
+        --bg3: #3a3a3c;
+        --text: #f2f2f7;
+        --text2: #8e8e93;
+        --border: rgba(255,255,255,0.12);
+        --accent: #4e9bff;
+        --accent-bg: #1a2e4a;
+      }
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+      background: var(--bg2);
+      color: var(--text);
+      min-height: 100dvh;
+      padding-top: calc(var(--safe-top) + 16px);
+      padding-bottom: calc(var(--safe-bot) + 24px);
+      padding-left: 16px;
+      padding-right: 16px;
+    }
+
+    h1 {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .subtitle {
+      font-size: 14px;
+      color: var(--text2);
+      margin-bottom: 24px;
+    }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .tabs::-webkit-scrollbar { display: none; }
+
+    .tab {
+      flex-shrink: 0;
+      padding: 8px 18px;
+      border-radius: 99px;
+      border: 1.5px solid var(--border);
+      background: var(--bg);
+      color: var(--text2);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      transition: all 0.15s;
+    }
+    .tab.active {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    /* Panels */
+    .panel { display: none; }
+    .panel.active { display: flex; flex-direction: column; gap: 16px; }
+
+    /* Card */
+    .card {
+      background: var(--bg);
+      border-radius: var(--radius);
+      padding: 20px;
+      border: 1px solid var(--border);
+    }
+    .card-title {
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text2);
+      margin-bottom: 16px;
+    }
+
+    /* Conversion row */
+    .conv-row {
+      display: grid;
+      grid-template-columns: 1fr 28px 1fr;
+      gap: 10px;
+      align-items: end;
+    }
+
+    .field label {
+      display: block;
+      font-size: 12px;
+      color: var(--text2);
+      margin-bottom: 6px;
+    }
+
+    input[type=number] {
+      width: 100%;
+      padding: 12px 14px;
+      font-size: 18px;
+      font-weight: 500;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      background: var(--bg2);
+      color: var(--text);
+      outline: none;
+      -webkit-appearance: none;
+    }
+    input[type=number]:focus {
+      border-color: var(--accent);
+      background: var(--bg);
+    }
+    input[type=number]::placeholder { color: var(--text2); font-weight: 400; }
+
+    .arrow-col {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding-bottom: 4px;
+      color: var(--text2);
+      font-size: 20px;
+    }
+
+    .result-box {
+      padding: 12px 14px;
+      background: var(--accent-bg);
+      border-radius: 10px;
+      min-height: 50px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .result-val {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--accent);
+    }
+    .result-unit {
+      font-size: 13px;
+      color: var(--text2);
+    }
+
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 16px 0;
+    }
+
+    .factor-note {
+      font-size: 12px;
+      color: var(--text2);
+      margin-top: 14px;
+      text-align: center;
+    }
+
+    /* iPad layout: dos columnas en pantallas anchas */
+    @media (min-width: 700px) {
+      body { max-width: 720px; margin: 0 auto; padding-left: 24px; padding-right: 24px; }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Conversor</h1>
+  <p class="subtitle">Torque · Longitud — uso mecánico</p>
+
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('inlb')">in·lb ↔ N·m</button>
+    <button class="tab" onclick="showTab('lbft')">lb·ft ↔ N·m</button>
+    <button class="tab" onclick="showTab('inch')">in ↔ mm</button>
+  </div>
+
+  <!-- Panel in·lb -->
+  <div id="panel-inlb" class="panel active">
+    <div class="card">
+      <div class="card-title">Pulgada-libra → Newton-metro</div>
+      <div class="conv-row">
+        <div class="field">
+          <label>in·lb</label>
+          <input type="number" inputmode="decimal" placeholder="0" id="inlb-a" oninput="conv('inlb-a','inlb-res', 0.112985)">
+        </div>
+        <div class="arrow-col">→</div>
+        <div class="field">
+          <label>N·m</label>
+          <div class="result-box">
+            <span class="result-val" id="inlb-res">—</span>
+            <span class="result-unit">N·m</span>
+          </div>
+        </div>
+      </div>
+      <hr class="divider">
+      <div class="card-title">Newton-metro → Pulgada-libra</div>
+      <div class="conv-row">
+        <div class="field">
+          <label>N·m</label>
+          <input type="number" inputmode="decimal" placeholder="0" id="nm-a" oninput="conv('nm-a','nm-res-a', 1/0.112985)">
+        </div>
+        <div class="arrow-col">→</div>
+        <div class="field">
+          <label>in·lb</label>
+          <div class="result-box">
+            <span class="result-val" id="nm-res-a">—</span>
+            <span class="result-unit">in·lb</span>
+          </div>
+        </div>
+      </div>
+      <p class="factor-note">1 in·lb = 0.112985 N·m</p>
+    </div>
+  </div>
+
+  <!-- Panel lb·ft -->
+  <div id="panel-lbft" class="panel">
+    <div class="card">
+      <div class="card-title">Pie-libra → Newton-metro</div>
+      <div class="conv-row">
+        <div class="field">
+          <label>lb·ft</label>
+          <input type="number" inputmode="decimal" placeholder="0" id="lbft-a" oninput="conv('lbft-a','lbft-res', 1.35582)">
+        </div>
+        <div class="arrow-col">→</div>
+        <div class="field">
+          <label>N·m</label>
+          <div class="result-box">
+            <span class="result-val" id="lbft-res">—</span>
+            <span class="result-unit">N·m</span>
+          </div>
+        </div>
+      </div>
+      <hr class="divider">
+      <div class="card-title">Newton-metro → Pie-libra</div>
+      <div class="conv-row">
+        <div class="field">
+          <label>N·m</label>
+          <input type="number" inputmode="decimal" placeholder="0" id="nm-b" oninput="conv('nm-b','nm-res-b', 1/1.35582)">
+        </div>
+        <div class="arrow-col">→</div>
+        <div class="field">
+          <label>lb·ft</label>
+          <div class="result-box">
+            <span class="result-val" id="nm-res-b">—</span>
+            <span class="result-unit">lb·ft</span>
+          </div>
+        </div>
+      </div>
+      <p class="factor-note">1 lb·ft = 1.35582 N·m</p>
+    </div>
+  </div>
+
+  <!-- Panel pulgadas -->
+  <div id="panel-inch" class="panel">
+    <div class="card">
+      <div class="card-title">Pulgadas → Milímetros</div>
+      <div class="conv-row">
+        <div class="field">
+          <label>in</label>
+          <input type="number" inputmode="decimal" placeholder="0" id="inch-a" oninput="conv('inch-a','inch-res', 25.4)">
+        </div>
+        <div class="arrow-col">→</div>
+        <div class="field">
+          <label>mm</label>
+          <div class="result-box">
+            <span class="result-val" id="inch-res">—</span>
+            <span class="result-unit">mm</span>
+          </div>
+        </div>
+      </div>
+      <hr class="divider">
+      <div class="card-title">Milímetros → Pulgadas</div>
+      <div class="conv-row">
+        <div class="field">
+          <label>mm</label>
+          <input type="number" inputmode="decimal" placeholder="0" id="mm-a" oninput="conv('mm-a','mm-res', 1/25.4)">
+        </div>
+        <div class="arrow-col">→</div>
+        <div class="field">
+          <label>in</label>
+          <div class="result-box">
+            <span class="result-val" id="mm-res">—</span>
+            <span class="result-unit">in</span>
+          </div>
+        </div>
+      </div>
+      <p class="factor-note">1 in = 25.4 mm</p>
+    </div>
+  </div>
+
+  <!-- Service Worker registro -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js');
+    }
+
+    function showTab(id) {
+      document.querySelectorAll('.tab').forEach((t, i) => {
+        t.classList.toggle('active', ['inlb','lbft','inch'][i] === id);
+      });
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      document.getElementById('panel-' + id).classList.add('active');
+    }
+
+    function fmt(n) {
+      if (isNaN(n)) return '—';
+      if (Math.abs(n) >= 1000) return n.toLocaleString('es-MX', {maximumFractionDigits: 2});
+      if (Math.abs(n) >= 10)   return parseFloat(n.toFixed(3)).toString();
+      return parseFloat(n.toFixed(4)).toString();
+    }
+
+    function conv(inputId, outputId, factor) {
+      const v = parseFloat(document.getElementById(inputId).value);
+      document.getElementById(outputId).textContent = isNaN(v) ? '—' : fmt(v * factor);
+    }
+  </script>
+</body>
+</html>

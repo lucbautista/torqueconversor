@@ -1,0 +1,22 @@
+{
+  "name": "Conversor Mecánico",
+  "short_name": "Conversor",
+  "description": "Conversor de torque y longitud para mecánica",
+  "start_url": "./conversor.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1a6ef5",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "https://fav.farm/🔧",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://fav.farm/🔧",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
