@@ -2,7 +2,7 @@
   "name": "Conversor Mecánico",
   "short_name": "Conversor",
   "description": "Conversor de torque y longitud para mecánica",
-  "start_url": "./conversor.html",
+  "start_url": "./torqueconversor.html",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#1a6ef5",
